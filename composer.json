@@ -1,0 +1,48 @@
+{
+    "name": "keloola/quota",
+    "description": "Billing quota management for Keloola apps. Supports snapshot (fixed) and counter (monthly-reset) quota metrics integrated with the pricing & subscription model.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "quota", "billing", "subscription", "saas", "limits"],
+    "authors": [
+        {
+            "name": "Keloola"
+        }
+    ],
+    "require": {
+        "php": "^8.0|^8.2|^8.4",
+        "illuminate/support": "^10.0|^11.0|^12|^13",
+        "illuminate/database": "^10.0|^11.0|^12|^13",
+        "illuminate/console": "^10.0|^11.0|^12|^13"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10",
+        "phpunit/phpunit": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Keloola\\Quota\\": "src/",
+            "Keloola\\Quota\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Keloola\\Quota\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Keloola\\Quota\\QuotaServiceProvider"
+            ],
+            "aliases": {
+                "Quota": "Keloola\\Quota\\Facades\\Quota"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
