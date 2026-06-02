@@ -33,9 +33,7 @@ class CheckQuota
                 ], 429); // 429 Too Many Requests
             }
         } catch (QuotaMetricNotFoundException $e) {
-            return response()->json([
-                'message' => __('keloola-quota::messages.metric_not_found', ['metric' => $metricName]),
-            ], 400);
+            \Illuminate\Support\Facades\Log::warning("Quota metric not found: " . $e->getMessage());
         } catch (\LogicException $e) {
             return response()->json([
                 'message' => __('keloola-quota::messages.context_missing'),

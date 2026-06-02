@@ -53,6 +53,10 @@ class QuotaManager
     public function limit(string $code): ?int
     {
         $metric = $this->metric($code);
+        if (! $metric) {
+            return null;
+        }
+
         $planQuota = $this->planQuota($metric->id);
 
         if (! $planQuota || $planQuota->is_unlimited) {
@@ -68,6 +72,10 @@ class QuotaManager
     public function used(string $code): int
     {
         $metric = $this->metric($code);
+        if (! $metric) {
+            return 0;
+        }
+
         $usage  = $this->usageRow($metric, create: false);
 
         return $usage?->used ?? 0;
@@ -114,10 +122,14 @@ class QuotaManager
      *
      * @throws QuotaExceededException
      */
-    public function increment(string $code, int $amount = 1, array $meta = []): QuotaUsage
+    public function increment(string $code, int $amount = 1, array $meta = []): ?QuotaUsage
     {
         return DB::transaction(function () use ($code, $amount, $meta) {
             $metric = $this->metric($code);
+            if (! $metric) {
+                return null;
+            }
+            
             $usage  = $this->lockedUsageRow($metric);
 
             $limit = $this->limit($code);
@@ -140,10 +152,14 @@ class QuotaManager
      * Decrement usage. Mainly for snapshot metrics (e.g. a user removed,
      * storage freed). Counters generally only go up until reset.
      */
-    public function decrement(string $code, int $amount = 1, array $meta = []): QuotaUsage
+    public function decrement(string $code, int $amount = 1, array $meta = []): ?QuotaUsage
     {
         return DB::transaction(function () use ($code, $amount, $meta) {
             $metric = $this->metric($code);
+            if (! $metric) {
+                return null;
+            }
+            
             $usage  = $this->lockedUsageRow($metric);
 
             $usage->used = max(0, $usage->used - $amount);
@@ -159,10 +175,14 @@ class QuotaManager
      * Set an absolute value. Ideal for snapshot metrics where you can
      * recompute the true count (e.g. storage recalculated from files).
      */
-    public function set(string $code, int $value, array $meta = []): QuotaUsage
+    public function set(string $code, int $value, array $meta = []): ?QuotaUsage
     {
         return DB::transaction(function () use ($code, $value, $meta) {
             $metric = $this->metric($code);
+            if (! $metric) {
+                return null;
+            }
+            
             $usage  = $this->lockedUsageRow($metric);
 
             $delta = $value - $usage->used;
@@ -251,7 +271,7 @@ class QuotaManager
      | Internals
      |----------------------------------------------------------------------*/
 
-    protected function metric(string $code): QuotaMetric
+    protected function metric(string $code): ?QuotaMetric
     {
         $this->assertApp();
 
@@ -260,7 +280,8 @@ class QuotaManager
             ->first();
 
         if (! $metric) {
-            throw QuotaMetricNotFoundException::forCode($this->appId, $code);
+            \Illuminate\Support\Facades\Log::warning("Quota metric not found: {$code} for app {$this->appId}");
+            return null;
         }
 
         return $metric;
