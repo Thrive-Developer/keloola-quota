@@ -11,7 +11,7 @@ Terintegrasi dengan model `QuotaMetric` dan `AppPlanQuota` dari ERD Pricing & Su
 
 ## Instalasi
 
-Tambahkan ke `composer.json` host app (path/VCS repository), lalu:
+Install via composer:
 
 ```bash
 composer require keloola/quota
