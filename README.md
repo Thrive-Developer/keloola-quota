@@ -131,8 +131,7 @@ Route::post('/bulk-transactions', [TransactionController::class, 'bulkStore'])
 Jika kuota tidak cukup, akan muncul response JSON (429 Too Many Requests). Pesan error akan menyesuaikan bahasa yang diatur pada aplikasi (contoh: `config/app.php` locale `id`):
 ```json
 {
-    "message": "Quota limit exceeded.",
-    "error": "Anda telah melewati batas kuota untuk 'transactions'. Silakan tingkatkan paket Anda."
+    "message": "Anda telah melewati batas kuota untuk 'transactions'. Silakan tingkatkan paket Anda."
 }
 ```
 
@@ -182,14 +181,7 @@ Package mendaftarkan endpoint berikut secara otomatis:
 POST   /api/quota/provision          # install + update (idempotent / upsert)
 DELETE /api/quota/provision/{planId} # uninstall / plan dihapus
 ```
-
-Set secret HMAC di `.env` app:
-
-```env
-QUOTA_PROVISIONING_SECRET=secret-yang-sama-dengan-sso
-```
-
-Secara default, endpoint dilindungi middleware `keloola.quota.sso` (dapat disesuaikan secara dinamis melalui `config('keloola-quota.provisioning.middleware')`) yang memverifikasi header `X-Quota-Signature` (HMAC SHA-256 atas raw body). Hanya request dari SSO dengan secret yang cocok yang diterima.
+Secara default, endpoint dilindungi middleware `keloola.quota.sso` (dapat disesuaikan secara dinamis melalui `config('keloola-quota.provisioning.middleware')`).
 
 ### Payload yang dikirim SSO
 

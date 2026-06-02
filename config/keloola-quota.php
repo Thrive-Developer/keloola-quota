@@ -119,8 +119,6 @@ return [
     | The SSO/billing service pushes plan quota definitions to this app on
     | install and whenever a plan changes. These routes receive that push.
     |
-    | secret       : shared HMAC secret used to verify the request really
-    |                comes from SSO. Set QUOTA_PROVISIONING_SECRET in .env.
     | route_prefix : URL prefix for the provisioning endpoints.
     | middleware   : middleware stack applied to the provisioning routes.
     | register_routes : set false to define the routes yourself instead.

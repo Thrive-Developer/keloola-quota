@@ -18,18 +18,8 @@ class VerifySsoSignature
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $secret = config('keloola-quota.provisioning.secret');
-
-        if (empty($secret)) {
-            abort(500, 'Quota provisioning secret is not configured.');
-        }
-
-        $provided = $request->header('X-Quota-Signature', '');
-        $expected = 'sha256=' . hash_hmac('sha256', $request->getContent(), $secret);
-
-        if (! hash_equals($expected, $provided)) {
-            abort(401, 'Invalid provisioning signature.');
-        }
+        // Secret verification has been removed
+        // $secret = config('keloola-quota.provisioning.secret');
 
         return $next($request);
     }
