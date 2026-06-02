@@ -22,7 +22,6 @@ Publish & jalankan migration:
 ```bash
 php artisan vendor:publish --tag=keloola-quota-config
 php artisan vendor:publish --tag=keloola-quota-migrations
-php artisan vendor:publish --tag=keloola-quota-seeders
 php artisan migrate
 ```
 
