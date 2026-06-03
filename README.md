@@ -212,3 +212,65 @@ app(QuotaProvisioningDispatcher::class)->pushPlan($quota->appPlan);
 Bungkus dalam queued job agar tidak memblok request bila app satelit lambat/down.
 
 > **Catatan**: provisioning ini hanya untuk **definisi quota (limit per plan)**. Status subscription aktif/expired tetap dicek terpisah (mis. API call + cache ke SSO), karena status berubah lebih dinamis daripada definisi limit.
+
+## Pengecekan Quota Lintas Aplikasi (Cross-App)
+
+Kadang-kadang satu aplikasi (misalnya SSO atau aplikasi lainnya) perlu mengecek limit quota dari aplikasi lain. Package ini menyediakan endpoint bawaan dan service khusus untuk kebutuhan tersebut.
+
+### Endpoint Pengecekan Quota
+
+Package ini secara otomatis mengekspos endpoint `GET /api/quota/check/{metricCode}` yang mengembalikan status penggunaan quota untuk suatu metrik secara langsung (lengkap dengan limit, used, remaining, dan lain-lain).
+
+```json
+// GET /api/quota/check/storage_space
+{
+    "status": "ok",
+    "data": {
+        "code": "storage_space",
+        "name": "Storage Space",
+        "type": "snapshot",
+        "unit": "MB",
+        "used": 500,
+        "limit": 1024,
+        "is_unlimited": false,
+        "remaining": 524,
+        "percent": 48.8
+    }
+}
+```
+
+### QuotaCheckService
+
+Untuk melakukan panggilan ke endpoint tersebut dari backend PHP Anda, package ini menyediakan `Keloola\Quota\Services\QuotaCheckService`. Service ini dapat menangani pemanggilan lintas aplikasi (Cross-App) secara aman dan sudah diregistrasikan sebagai Singleton di Service Provider.
+
+#### Penggunaan via API URL & Token Dinamis
+```php
+use Keloola\Quota\Services\QuotaCheckService;
+
+$service = app(QuotaCheckService::class);
+$response = $service->checkQuota('https://app.keloola.in', 'storage_space', $jwtToken);
+
+if ($response && $response['status'] === 'ok') {
+    $remaining = $response['data']['remaining'];
+    // ... logic
+}
+```
+
+#### Pengaturan Konfigurasi Cross-App (Misal: Storage)
+Package ini juga mendukung konfigurasi untuk layanan spesifik di `config/keloola-quota.php`. Anda bisa mengatur `api_url` dan `metric_code` via `.env`.
+
+**`config/keloola-quota.php`**:
+```php
+'storage' => [
+    'api_url'     => env('KELOOLA_FILE_API_URL', 'https://file.keloola.in'),
+    'metric_code' => env('KELOOLA_FILE_METRIC_CODE', 'storage_space'),
+],
+```
+
+**Penggunaan di Service**:
+```php
+$apiUrl = config('keloola-quota.storage.api_url');
+$metricCode = config('keloola-quota.storage.metric_code');
+
+$response = app(QuotaCheckService::class)->checkQuota($apiUrl, $metricCode, $jwtToken);
+```

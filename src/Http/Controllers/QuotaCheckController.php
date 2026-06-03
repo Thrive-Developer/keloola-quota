@@ -1,0 +1,45 @@
+<?php
+
+namespace Keloola\Quota\Http\Controllers;
+
+use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controller;
+use Keloola\Quota\Facades\Quota;
+use Keloola\Quota\Models\QuotaMetric;
+
+class QuotaCheckController extends Controller
+{
+    /**
+     * Check quota details for a specific metric.
+     */
+    public function show(string $metricCode): JsonResponse
+    {
+        $metric = QuotaMetric::where('code', $metricCode)->first();
+
+        if (!$metric) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Quota metric not found.',
+            ], 404);
+        }
+
+        $limit = Quota::limit($metricCode);
+        $used = Quota::used($metricCode);
+        $remaining = Quota::remaining($metricCode);
+
+        return response()->json([
+            'status' => 'ok',
+            'data' => [
+                'code'         => $metric->code,
+                'name'         => $metric->name,
+                'type'         => $metric->type,
+                'unit'         => $metric->unit,
+                'used'         => $used,
+                'limit'        => $limit,
+                'is_unlimited' => $limit === null,
+                'remaining'    => $remaining,
+                'percent'      => $limit ? round(($used / $limit) * 100, 1) : 0.0,
+            ],
+        ]);
+    }
+}

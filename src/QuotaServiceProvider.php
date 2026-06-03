@@ -20,6 +20,8 @@ class QuotaServiceProvider extends ServiceProvider
         $this->app->alias('keloola.quota', QuotaManager::class);
 
         $this->app->singleton(QuotaProvisioner::class, fn () => new QuotaProvisioner());
+        $this->app->singleton(\Keloola\Quota\Services\QuotaCheckService::class, fn () => new \Keloola\Quota\Services\QuotaCheckService());
+        $this->app->singleton(\Keloola\Quota\Services\StorageQuotaService::class, fn () => new \Keloola\Quota\Services\StorageQuotaService());
     }
 
     public function boot(): void

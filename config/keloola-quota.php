@@ -141,6 +141,19 @@ return [
     |
     */
     'sso' => [
-        'base_url' => env('KELOOLA_AUTH_SSO_HOST', 'http://localhost:8000'),
+        'base_url'           => env('KELOOLA_AUTH_SSO_HOST', 'http://localhost:8000'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Storage Quota
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for cross-app storage quota checking using QuotaCheckService.
+    |
+    */
+    'storage' => [
+        'api_url'     => env('KELOOLA_FILE_API_URL', 'https://file.keloola.in'),
+        'metric_code' => env('KELOOLA_FILE_METRIC_CODE', 'storage_space'),
     ],
 ];
