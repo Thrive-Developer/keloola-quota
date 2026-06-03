@@ -27,6 +27,15 @@ class QuotaCheckController extends Controller
         $used = Quota::used($metricCode);
         $remaining = Quota::remaining($metricCode);
 
+        $mbUnits = ['mb', 'megabyte'];
+        $unitLower = strtolower(trim($metric->unit ?? ''));
+
+        if (in_array($unitLower, $mbUnits)) {
+            $used = $used !== null ? round($used / 1048576, 2) : 0;
+            $limit = $limit !== null ? round($limit / 1048576, 2) : null;
+            $remaining = $remaining !== null ? round($remaining / 1048576, 2) : null;
+        }
+
         return response()->json([
             'status' => 'ok',
             'data' => [

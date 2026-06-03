@@ -36,7 +36,18 @@ class StorageQuotaService
             $totalSize = $files->getSize();
         }
 
-        $totalSizeMb = $totalSize / 1048576; // Convert bytes to MB
-        return $totalSizeMb <= data_get($response, 'data.remaining', 0);
+        $isUnlimited = data_get($response, 'data.is_unlimited', false);
+        if ($isUnlimited) {
+            return true;
+        }
+
+        $mbUnits = ['mb', 'megabyte'];
+        $unitLower = strtolower(trim(data_get($response, 'data.unit', '')));
+
+        if (in_array($unitLower, $mbUnits)) {
+            $totalSize = $totalSize / 1048576; // Convert bytes to MB
+        }
+
+        return $totalSize <= data_get($response, 'data.remaining', 0);
     }
 }
