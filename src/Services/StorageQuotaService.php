@@ -41,13 +41,15 @@ class StorageQuotaService
             return true;
         }
 
+        $remaining = data_get($response, 'data.remaining', 0);
+
         $mbUnits = ['mb', 'megabyte'];
         $unitLower = strtolower(trim(data_get($response, 'data.unit', '')));
 
         if (in_array($unitLower, $mbUnits)) {
-            $totalSize = $totalSize / 1048576; // Convert bytes to MB
+            $remaining = $remaining * 1048576; // Convert MB to bytes
         }
 
-        return $totalSize <= data_get($response, 'data.remaining', 0);
+        return $totalSize <= $remaining;
     }
 }

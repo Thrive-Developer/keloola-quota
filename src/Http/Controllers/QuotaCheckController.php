@@ -32,8 +32,7 @@ class QuotaCheckController extends Controller
 
         if (in_array($unitLower, $mbUnits)) {
             $used = $used !== null ? round($used / 1048576, 2) : 0;
-            $limit = $limit !== null ? round($limit / 1048576, 2) : null;
-            $remaining = $remaining !== null ? round($remaining / 1048576, 2) : null;
+            $remaining = $limit - $used;
         }
 
         return response()->json([
