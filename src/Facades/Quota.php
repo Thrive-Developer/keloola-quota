@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Keloola\Quota\Services\QuotaManager for(string|int $organizationId)
  * @method static \Keloola\Quota\Services\QuotaManager plan(string|int $appPlanId)
  * @method static ?int limit(string $code)
+ * @method static bool isUnlimited(string $code)
  * @method static int used(string $code)
  * @method static ?int remaining(string $code)
  * @method static bool canConsume(string $code, int $amount = 1)

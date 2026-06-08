@@ -67,6 +67,22 @@ class QuotaManager
     }
 
     /**
+     * Whether the metric is explicitly flagged unlimited on the active plan.
+     *
+     * Reads the `is_unlimited` column on app_plan_quotas directly, so an
+     * un-provisioned metric (no plan quota row) is NOT treated as unlimited.
+     */
+    public function isUnlimited(string $code): bool
+    {
+        $metric = $this->metric($code);
+        if (! $metric) {
+            return true;
+        }
+
+        return (bool) $this->planQuota($metric->id)?->is_unlimited;
+    }
+
+    /**
      * Current usage of a metric for the active organization.
      */
     public function used(string $code): int
@@ -260,7 +276,7 @@ class QuotaManager
                 'unit'         => $metric->unit,
                 'used'         => $used,
                 'limit'        => $limit,
-                'is_unlimited' => $limit === null,
+                'is_unlimited' => $this->isUnlimited($metric->code),
                 'remaining'    => $limit === null ? null : max(0, $limit - $used),
                 'percent'      => $limit ? round(($used / $limit) * 100, 1) : 0.0,
             ]];

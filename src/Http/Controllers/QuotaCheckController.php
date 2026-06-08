@@ -44,7 +44,7 @@ class QuotaCheckController extends Controller
                 'unit'         => $metric->unit,
                 'used'         => $used,
                 'limit'        => $limit,
-                'is_unlimited' => $limit === null,
+                'is_unlimited' => Quota::isUnlimited($metricCode),
                 'remaining'    => $remaining,
                 'percent'      => $limit ? round(($used / $limit) * 100, 1) : 0.0,
             ],
